@@ -8,13 +8,13 @@ import java.util.Queue;
 public class Algorithms {
 
     /**
-     * Returns the larger of two values.
+     * Returns the smaller of two values.
      * @param a Value 1.
      * @param b Value 2.
-     * @return max(a, b)
+     * @return min(a, b)
      */
-    private int max(int a, int b) {
-        return a > b ? a : b;
+    static private int min(int a, int b) {
+        return a < b ? a : b;
     }
 
     /**
@@ -23,19 +23,19 @@ public class Algorithms {
      * @param queue the queue to sort
      */
     public static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
-        int queueSize = queue.size();
-        if (queueSize <= 1)
+        int size = queue.size();
+        if (size <= 1)
             return; // nothing to do
         
         /* 
         This is a bottom-up merge sort implemented using a queue. Starts with
         groups of 2 elements, doubling in size each iteration.
         */
-        int sublistSize = 1;
+        int subSize = 1;
         Queue<T> left = new LinkedList<>();
         Queue<T> right = new LinkedList<>();
         int iterations = 0;
-        while (sublistSize < queueSize) {
+        while (subSize < size) {
             iterations++;
             System.out.println("" + iterations + " " + queue);
             // if queue size is a multiple of sublist size, stop at end of
@@ -47,45 +47,46 @@ public class Algorithms {
                 System.out.println("i " + i);
 
                 // pop left sublist into left queue, storing minimum value.
-                for (int j = 0; j < sublistSize; j++) {
-                    if (i + j >= queueSize)
-                        break; // could run off end of queue.
+                int limit = min(i+subSize, size);
+                for (int j = i; j < limit; j++) {
                     left.add(queue.remove());
                 }
 
                 // pop right sublist into queue, storing smallest value.
-                for (int j = sublistSize; j < 2*sublistSize; j++) {
-                    if (i + j >= queueSize)
-                        break; // right sublist could run off end of queue.
+                limit = min(i+2*subSize, size);
+                for (int j = i+subSize; j < limit; j++) {
                     right.add(queue.remove());
                 }
                 System.out.println("" + left + " / " + right);
 
                 // assuming the sublists are sorted individually, we check
                 // which one should be ordered first.
-                while (!right.isEmpty()) {
-                    T temp = left.peek();
-                    if (temp.compareTo(right.element()) < 0) {
-                        queue.add(temp);
-                        temp = right.peek();
-                    } else if (temp.compareTo(left.element()) < 0){
-                        queue.add(temp);
-                        temp = right.peek();
+                // merge sublists in order
+                while (!(left.isEmpty() || right.isEmpty())) {
+                    if (left.element().compareTo(right.element()) < 0) {
+                        queue.add(left.remove());
+                    } else {
+                        queue.add(right.remove());
                     }
                 }
+                // one of left/right is empty. add all of the other queue
+                // back to the main queue.
+                while (!right.isEmpty())
+                    queue.add(right.remove());
                 while (!left.isEmpty())
                     queue.add(left.remove());
+
                 System.out.println(queue);
                 System.out.println();
-                assert queueSize ==  queue.size();
+                assert size == queue.size();
 
-                i += 2*sublistSize; // because iterating over pairs of sublists.
-            } while (i < queueSize);
-            sublistSize *= 2;
+                i += 2*subSize; // because iterating over pairs of sublists.
+            } while (i < size);
+            subSize *= 2;
         }
 
         System.out.println(queue);
-        System.out.println("took " + iterations + " iterations, size " + queueSize);
+        System.out.println("took " + iterations + " iterations, size " + size);
         System.out.println();
     }
 
