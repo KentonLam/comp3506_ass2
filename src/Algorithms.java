@@ -8,54 +8,84 @@ import java.util.Queue;
 public class Algorithms {
 
     /**
+     * Returns the larger of two values.
+     * @param a Value 1.
+     * @param b Value 2.
+     * @return max(a, b)
+     */
+    private int max(int a, int b) {
+        return a > b ? a : b;
+    }
+
+    /**
      * Write your implementation of the sortQueue algorithm here
      *
      * @param queue the queue to sort
      */
     public static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
-        if (queue.size() <= 1)
+        int queueSize = queue.size();
+        if (queueSize <= 1)
             return; // nothing to do
-        int size = queue.size();
-        T a, b, prev;
-        boolean repeat = true;
+        
+        /* 
+        This is a bottom-up merge sort implemented using a queue. Starts with
+        groups of 2 elements, doubling in size each iteration.
+        */
+        int sublistSize = 1;
+        Queue<T> left = new LinkedList<>();
+        Queue<T> right = new LinkedList<>();
         int iterations = 0;
-        while (repeat) {
+        while (sublistSize < queueSize) {
             iterations++;
-            repeat = false;
-            //System.out.println("\niterating");
-            System.out.println("" + iterations + ": " + queue);
+            System.out.println("" + iterations + " " + queue);
+            // if queue size is a multiple of sublist size, stop at end of
+            // queue. otherwise, we need to overshoot to get the last sublist.
 
-            a = queue.remove();
-            b = null;
-            prev = null; // previously pushed element
+            // for each pair of two sublists
+            int i = 0;
+            do {
+                System.out.println("i " + i);
 
-            for (int i = 0; i < size - 1; i++) {
-                if (a == null) {
-                    a = queue.remove();
-                } else {
-                    b = queue.remove();
+                // pop left sublist into left queue, storing minimum value.
+                for (int j = 0; j < sublistSize; j++) {
+                    if (i + j >= queueSize)
+                        break; // could run off end of queue.
+                    left.add(queue.remove());
                 }
-                // toPush is the smaller of 'a' and 'b'.
-                T toPush = a.compareTo(b) < 0 ? a : b;
-                T other = toPush == a ? b : a;
-                queue.add(toPush); // push smaller to end of queue.
-                //System.out.println("pushing "+toPush+", keeping "+other);
-                if (a == toPush) {
-                    a = null;
-                } else {
-                    b = null;
+
+                // pop right sublist into queue, storing smallest value.
+                for (int j = sublistSize; j < 2*sublistSize; j++) {
+                    if (i + j >= queueSize)
+                        break; // right sublist could run off end of queue.
+                    right.add(queue.remove());
                 }
-                if (!repeat && prev != null && prev.compareTo(toPush) > 0) {
-                    //System.out.println("REPEAT FLAG SET");
-                    repeat = true;
+                System.out.println("" + left + " / " + right);
+
+                // assuming the sublists are sorted individually, we check
+                // which one should be ordered first.
+                while (!right.isEmpty()) {
+                    T temp = left.peek();
+                    if (temp.compareTo(right.element()) < 0) {
+                        queue.add(temp);
+                        temp = right.peek();
+                    } else if (temp.compareTo(left.element()) < 0){
+                        queue.add(temp);
+                        temp = right.peek();
+                    }
                 }
-                prev = toPush;
-            }
-            // add back the last element.
-            queue.add(a != null ? a : b);
+                while (!left.isEmpty())
+                    queue.add(left.remove());
+                System.out.println(queue);
+                System.out.println();
+                assert queueSize ==  queue.size();
+
+                i += 2*sublistSize; // because iterating over pairs of sublists.
+            } while (i < queueSize);
+            sublistSize *= 2;
         }
+
         System.out.println(queue);
-        System.out.println("took " + iterations + " iterations, size " + size);
+        System.out.println("took " + iterations + " iterations, size " + queueSize);
         System.out.println();
     }
 
