@@ -8,80 +8,52 @@ import java.util.Queue;
 public class Algorithms {
 
     /**
-     * Returns the smaller of two values.
-     * @param a Value 1.
-     * @param b Value 2.
-     * @return min(a, b)
-     */
-    static private int min(int a, int b) {
-        return a < b ? a : b;
-    }
-
-    /**
      * Write your implementation of the sortQueue algorithm here
      *
      * @param queue the queue to sort
      */
     public static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
-        int size = queue.size();
-        if (size <= 1)
+        if (queue.size() <= 1)
             return; // nothing to do
-        
-        /* 
-        This is a bottom-up merge sort implemented using a queue. Starts with
-        groups of 2 elements, doubling in size each iteration.
-        */
-        int subSize = 1;
-        Queue<T> left = new LinkedList<>();
-        Queue<T> right = new LinkedList<>();
+        int size = queue.size();
+        T a, b, prev;
+        boolean repeat = true;
         int iterations = 0;
-        while (subSize < size) {
+        while (repeat) {
             iterations++;
-            System.out.println("" + iterations + " " + queue);
-            // for each pair of two sublists
-            int i = 0;
-            do {
-                System.out.println("i " + i);
+            repeat = false;
+            //System.out.println("\niterating");
+            System.out.println("" + iterations + ": " + queue);
 
-                // pop left sublist into left queue, storing minimum value.
-                int limit = min(i+subSize, size);
-                for (int j = i; j < limit; j++) {
-                    left.add(queue.remove());
+            a = queue.remove();
+            b = null;
+            prev = null; // previously pushed element
+
+            for (int i = 0; i < size - 1; i++) {
+                if (a == null) {
+                    a = queue.remove();
+                } else {
+                    b = queue.remove();
                 }
-
-                // pop right sublist into queue, storing smallest value.
-                limit = min(i+2*subSize, size);
-                for (int j = i+subSize; j < limit; j++) {
-                    right.add(queue.remove());
+                // toPush is the smaller of 'a' and 'b'.
+                T toPush = a.compareTo(b) < 0 ? a : b;
+                T other = toPush == a ? b : a;
+                queue.add(toPush); // push smaller to end of queue.
+                //System.out.println("pushing "+toPush+", keeping "+other);
+                if (a == toPush) {
+                    a = null;
+                } else {
+                    b = null;
                 }
-                System.out.println("" + left + " / " + right);
-
-                // assuming the sublists are sorted individually, we check
-                // which one should be ordered first.
-                // merge sublists in order
-                while (!(left.isEmpty() || right.isEmpty())) {
-                    if (left.element().compareTo(right.element()) < 0) {
-                        queue.add(left.remove());
-                    } else {
-                        queue.add(right.remove());
-                    }
+                if (!repeat && prev != null && prev.compareTo(toPush) > 0) {
+                    //System.out.println("REPEAT FLAG SET");
+                    repeat = true;
                 }
-                // one of left/right is empty. add all of the other queue
-                // back to the main queue.
-                while (!right.isEmpty())
-                    queue.add(right.remove());
-                while (!left.isEmpty())
-                    queue.add(left.remove());
-
-                System.out.println(queue);
-                System.out.println();
-                assert size == queue.size();
-
-                i += 2*subSize; // because iterating over pairs of sublists.
-            } while (i < size);
-            subSize *= 2;
+                prev = toPush;
+            }
+            // add back the last element.
+            queue.add(a != null ? a : b);
         }
-
         System.out.println(queue);
         System.out.println("took " + iterations + " iterations, size " + size);
         System.out.println();
