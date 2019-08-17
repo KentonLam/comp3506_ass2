@@ -38,9 +38,6 @@ public class Algorithms {
         while (subSize < size) {
             iterations++;
             System.out.println("" + iterations + " " + queue);
-            // if queue size is a multiple of sublist size, stop at end of
-            // queue. otherwise, we need to overshoot to get the last sublist.
-
             // for each pair of two sublists
             int i = 0;
             do {
