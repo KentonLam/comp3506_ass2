@@ -59,6 +59,41 @@ public class Algorithms {
         System.out.println();
     }
 
+    /** Returns the absolute value of a. */
+    private static int abs(int a) {
+        return a < 0 ? -a : a;
+    }
+
+    private static int findNumInRange(int[] numbers, int start, int end) {
+        int len = end - start + 1; // length of subarray we are considering
+        // System.out.println(Arrays.toString(numbers) + " " + start + " " +end);
+        if (len == 2) { // base case.
+            return (numbers[start] + numbers[end]) / 2; // average of 2 points.
+        }
+
+        int middle = start + len/2; // index of middle split
+        // total differences between start and end of left/right halves.
+        int leftDiff = numbers[middle] - numbers[start];
+        int rightDiff = numbers[end] - numbers[middle];
+
+        // to compute the difference between adjacent elements, we test
+        //      | leftDiff / (middle-start) |  > | rightDiff / (len - middle) |
+        // which occurs if and only if
+        //      |leftDiff| * (len - middle) > |rightDiff| * (middle - start)
+        // to avoid floating-point rounding problems
+        int leftCompare = leftDiff * (end - middle);
+        int rightCompare = rightDiff * (middle - start);
+
+        // side with larger absolute delta has a missing number.
+        if (abs(leftCompare) > abs(rightCompare)) {
+            // missing number is in the left half.
+            return findNumInRange(numbers, start, middle);
+        } else {
+            // missing number is in the right half.
+            return findNumInRange(numbers, middle, end);
+        }
+    }
+
     /**
      * Write your implementation of the findMissingNumber algorithm here
      *
@@ -66,7 +101,7 @@ public class Algorithms {
      * @return the missing number in the sequence
      */
     public static int findMissingNumber(int[] numbers) {
-        return 0;
+        return findNumInRange(numbers, 0, numbers.length-1);
     }
 
     public static void main(String[] args) {
@@ -77,11 +112,7 @@ public class Algorithms {
         Queue<Integer> q = new LinkedList<>(Arrays.asList(
                 76, 85, 18, 31, 19, 86, 42, 46, 72, 66,
                 64, 16, 68, 5, 73, 93, 84, 88, 92, 99, 3, 4, 5));
-        sortQueue(q);
-        sortQueue(q);
 
-        sortQueue(new LinkedList<>(Arrays.asList(
-                10, 9, 8, 7, 6, 5, 4, 3, 1, 2, 2
-        )));
+        System.out.println(findMissingNumber(new int[] {0, 1, 3}));
     }
 }

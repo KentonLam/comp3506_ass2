@@ -1,5 +1,6 @@
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -50,5 +51,30 @@ public class AlgorithmsTest {
     public void testFindMissingNumberExample2() {
         int[] arr = {4, 1, -5};
         assertEquals(-2, Algorithms.findMissingNumber(arr));
+    }
+
+    @Test
+    public void testFindMissingNum() {
+        int maxLen = 5;
+        int[] deltas = {1, 2, -1, -3, -7};
+        int[] sequence;
+        for (int d : deltas) {
+            sequence = new int[maxLen-1];
+            for (int missing = 1; missing < maxLen-1; missing++) {
+                int j = 0;
+                for (int i = 0; i < maxLen; i++) {
+                    if (i == missing) continue;
+                    sequence[j] = -5 + i*d;
+                    j++;
+                }
+                int result = Algorithms.findMissingNumber(sequence);
+                assertEquals(-5 + missing*d, result);
+            }
+        }
+    }
+
+    @Test
+    public void testConstantSequence() {
+        assertEquals(5, Algorithms.findMissingNumber(new int[] {5, 5, 5}));
     }
 }
