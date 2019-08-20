@@ -41,8 +41,10 @@ Note that in bubble sort, exactly $k$ iterations of `bubbling' are needed to sor
 an array with $k$ unordered elements.
 
 With this in mind, we count the worst-case number of primitive operations,
-noted in the comments below. Assume methods on the queue are 1 primitive operation and 
-$i$++ is compiled to one primitive operation.
+noted in the comments below. Assume $i$++ is compiled to one primitive operation.
+Also assume queue methods are 1 primitive operation, as we are looking for an asymptotic 
+limit. This could change depending 
+on the implementation of queue used. We assume Java's \textit{LinkedList}.
 
 \newpage
 \begin{lstlisting}[language=Java]

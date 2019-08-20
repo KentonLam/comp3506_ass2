@@ -64,6 +64,14 @@ public class Algorithms {
         return a < 0 ? -a : a;
     }
 
+    /**
+     * Computes the missing number in a given arithmetic sequence. The number
+     * should be missing between numbers[start] and numbers[end].
+     * @param numbers Arithmetic sequence with one missing term.
+     * @param start Lowest bound of missing term's index.
+     * @param end Upper bound of missing term's index.
+     * @return Value of missing term.
+     */
     private static int findNumInRange(int[] numbers, int start, int end) {
         int len = end - start + 1; // length of subarray we are considering
         // System.out.println(Arrays.toString(numbers) + " " + start + " " +end);
