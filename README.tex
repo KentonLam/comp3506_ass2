@@ -1,0 +1,136 @@
+\documentclass[11pt,a4paper]{article} % Default style and margins
+\usepackage{courier}
+\input{../../header.tex}
+% \input{../../problem_set.tex}
+
+\titleformat{\part}
+{\normalfont\Large}{Problem }{0 pt}{}[\hrule]
+
+\author{Kenton Lam}
+\date{{Due 23/08/2019 5:00 pm}}
+\title{COMP3506 -- Assignment 2}
+
+\begin{document}
+%\includepdf[pages=1]{Coversheet_45294583_10112906_20190329165713[1522].pdfz}
+% \blankpage
+
+\setcounter{page}{1}
+\maketitle
+\section*{Question 2}
+\subsection*{Analysis of {sortQueue}}
+
+The algorithm implemented is a variant of bubble sort (the algorithm wont be
+explained, see code comments). The runtime of this algorithm depends on the number
+of elements out of order. Also, note that bubble sort moves elements at different speeds,
+depending if they need to move up or down. Suppose we have a queue of $n$ elements
+\begin{align*}
+    A &= \left[ a_1, a_2, \ldots, a_n \right].
+\end{align*}
+We define $k$, the number of elements 
+out of order, as below. $\# \left\{ \ldots\right\}$ denotes the number of elements in the given set.
+\begin{align*}
+    k &= \# \left\{a_i ~|~ \exists\, i < j \le n \text{ s.t. } a_j < a_i\right\}
+\end{align*}
+For example, 
+\begin{align*}
+    A &= \left[ 1, 2, 3, 4 \right] \implies k = 0 \\ 
+    A &= \left[ 4, 1, 2, 3 \right] \implies k = 1 \\ 
+    A &= \left[ 4, 3, 2, 1 \right] \implies k = 4
+\end{align*}
+Note that in bubble sort, exactly $k$ iterations of `bubbling' are needed to sort
+an array with $k$ unordered elements.
+
+With this in mind, we count the worst-case number of primitive operations,
+noted in the comments below. Assume methods on the queue are 1 primitive operation and 
+$i$++ is compiled to one primitive operation.
+
+\newpage
+\begin{lstlisting}[language=Java]
+static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
+    // INIT section
+    int size = queue.size(); // 2: .size(), assignment
+    if (size <= 1)           // 1: comparison
+        return;              // 1: return
+    T a, b, prev;            // 0: compiler declarations
+    boolean repeat = true;   // 1: assignment
+
+    // WHILE section (executes k times)
+    while (repeat) {         // 1: comparison
+        repeat = false;      // 1: assignment
+
+        a = queue.remove();  // 2: .remove(), assignment
+        b = null;            // 1: assignment
+        prev = null;         // 1: assignment
+
+        // 1: initial assignment i = 0
+        // FOR section (executes n-1 times)
+        for (int i = 0; i < size - 1; i++) {
+            if (a == null) {        // 1: comparison
+                a = queue.remove(); // 2: .remove(), assignment
+            } else {
+                b = queue.remove(); // 2: .remove(), assignment
+            }
+
+            // 3: .compareTo(), comparison, assignment
+            T toPush = a.compareTo(b) < 0 ? a : b;
+            // 2: comparison, assignment
+            T other = toPush == a ? b : a;
+            // 1: .add()
+            queue.add(toPush);
+
+            if (a == toPush) { // 1: comparison
+                a = null;      // 1: assignment
+            } else {
+                b = null;      // 1: assignment
+            }
+            // on first run, prev = null so
+            //   1: comparison
+            // on subsequent runs, prev != null so
+            //   3: comparison, .comparTo(), comparison
+            if (prev != null && prev.compareTo(toPush) > 0) {
+                repeat = true; // 1: assignment
+            }
+            prev = toPush;     // 1: assignment
+        }
+        // 3: .add(), comparison
+        queue.add(a != null ? a : b);
+    }
+}
+\end{lstlisting}
+
+Let $T_i(n, k)$, $T_w(n, k)$ and $T_f(n, k)$ denote the primitive operations used in 
+each iteration of the `INIT', `WHILE' and `FOR' sections respectively. We seek $T(n, k)$, the total
+number of primitive operations given $n$ and $k$. From here, we assume $n \ge 2$
+otherwise $T(n, k) = 3$ trivially.
+\begin{itemize}
+    \item Firstly, $T_i(n, k) = 5$ because there are a constant number of operations.
+    \item Then, working inside-out, we consider the inner for loop. Because we are looking for
+    an upper bound, that the branch of the final if statement is taken every iteration.
+    Then, $T_f(n, k) = 16$.
+    \item The while loop contains $10$ primitive operations and $n-1$ iterations of the for loop, so 
+    $T_w(n, k) = 10 + (n-1)T_f(n, k)$.
+    \item Finally, the function contains $k$ iterations of the while loop, so 
+    \begin{align*}
+        T(n, k) &= T_i(n, k) + k T_w(n, k) \\ 
+        &= 5 + k(10 + (n-1)16) \\ 
+        &= 5 + 10k + k(n-1)16 \\ 
+        &= 5 - 6k + 16nk
+    \end{align*}
+\end{itemize}
+Because we are looking for the worst-case upper bound, we assume $k = n$. Then, we have 
+$T(n) = 5 - 6n + 16n^2$. We claim this is $O(n^2)$. That is, there exists $c$ and $n_0$ such that 
+\begin{align*}
+    n \ge n_0 \implies T(n) \le cn^2.
+\end{align*}
+Assume $n \ge 1$. Then,
+\begin{align*}
+    T(n) = 5 - 6n + 16n^2 \le 5 + 16n^2 \le 5n^2 + 16n^2 = 21n^2.
+\end{align*}
+So $n_0 = 1$ and $c = 21$ fulfil this requirement and $T(n) \in O(n^2)$.
+
+
+
+\section*{Question 4}
+\subsection*{Analysis of {findMissingNumber}}
+
+\end{document}
