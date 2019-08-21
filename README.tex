@@ -16,8 +16,7 @@
 
 \setcounter{page}{1}
 \maketitle
-\section*{Question 2}
-\subsection*{Analysis of {sortQueue}}
+\section*{Question 2 -- {Analysis of {sortQueue}}}
 
 The algorithm implemented is a variant of bubble sort (the algorithm wont be
 explained, see code comments). The runtime of this algorithm depends on the number
@@ -100,20 +99,20 @@ static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
 }
 \end{lstlisting}
 
-Let $T_i(n, k)$, $T_w(n, k)$ and $T_f(n, k)$ denote the primitive operations used in 
+Let $T_I(n, k)$, $T_W(n, k)$ and $T_F(n, k)$ denote the primitive operations used in 
 each iteration of the `INIT', `WHILE' and `FOR' sections respectively. We seek $T(n, k)$, the total
 number of primitive operations given $n$ and $k$. From here, we assume $n \ge 2$
 otherwise $T(n, k) = 3$ trivially.
 \begin{itemize}
-    \item Firstly, $T_i(n, k) = 5$ because there are a constant number of operations.
+    \item Firstly, $T_I(n, k) = 5$ because there are a constant number of operations.
     \item Then, working inside-out, we consider the inner for loop. Because we are looking for
     an upper bound, that the branch of the final if statement is taken every iteration.
-    Then, $T_f(n, k) = 16$.
+    Then, $T_F(n, k) = 16$.
     \item The while loop contains $10$ primitive operations and $n-1$ iterations of the for loop, so 
-    $T_w(n, k) = 10 + (n-1)T_f(n, k)$.
+    $T_W(n, k) = 10 + (n-1)T_F(n, k)$.
     \item Finally, the function contains $k$ iterations of the while loop, so 
     \begin{align*}
-        T(n, k) &= T_i(n, k) + k T_w(n, k) \\ 
+        T(n, k) &= T_I(n, k) + k T_W(n, k) \\ 
         &= 5 + k(10 + (n-1)16) \\ 
         &= 5 + 10k + k(n-1)16 \\ 
         &= 5 - 6k + 16nk
@@ -131,8 +130,20 @@ Assume $n \ge 1$. Then,
 So $n_0 = 1$ and $c = 21$ fulfil this requirement and $T(n) \in O(n^2)$.
 
 
+\section*{Question 4 -- {Analysis of {findMissingNumber}}}
+It can be seen that the algorithm implemented performs a constant 
+number of operations, then a recursive call on $n/2$ of the input size.
+Then if $n$ is the input size, then the running time of findMissingNumber
+is
+\begin{align*}
+    T(n) &= T(n/2) + O(1).
+\end{align*}
+Thus, the call tree looks like a sequence (a tree where nodes have at most one child)
+of length $\lceil \log_2 n\rceil$. Each function call takes $O(1)$ operations, so the total 
+worst case runtime is 
+\begin{align*}
+    T(n) &= O(1)\lceil \log_2 n\rceil  \in O(\log_2 n).
+\end{align*}
 
-\section*{Question 4}
-\subsection*{Analysis of {findMissingNumber}}
 
 \end{document}
