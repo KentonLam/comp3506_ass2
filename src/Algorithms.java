@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
 
 /**
@@ -19,7 +17,6 @@ public class Algorithms {
         T a, b, prev;
         boolean repeat = true;
         while (repeat) {
-            iterations++;
             repeat = false;
             //System.out.println("\niterating");
 
@@ -68,7 +65,7 @@ public class Algorithms {
         int len = end - start + 1; // length of subarray we are considering
         // System.out.println(Arrays.toString(numbers) + " " + start + " " +end);
         if (len == 2) { // base case.
-            return (numbers[start] + numbers[end]) / 2; // average of 2 points.
+            return numbers[start] + delta;
         }
 
         int middle = start + len/2; // index of middle split
@@ -76,7 +73,9 @@ public class Algorithms {
 
         // if the left difference is exactly the number of steps on the left
         // side + 1, then we know that the number is missing from the left.
-        if (leftDifference == delta * (middle - start+ 1)) {
+        // WARNING: this will break in weird ways if the assumptions aren't
+        // met.
+        if (leftDifference == delta * (middle - start + 1)) {
             // missing number is in the left half.
             return findNumInRange(numbers, start, middle, delta);
         } else {
@@ -100,15 +99,4 @@ public class Algorithms {
         return findNumInRange(numbers, 0, len, delta);
     }
 
-    public static void main(String[] args) {
-        Queue<String> queue = new LinkedList<>();
-        queue.addAll(Arrays.asList("a", "b", "a", "z", "c", "a", "b"));
-        sortQueue(queue);
-
-        Queue<Integer> q = new LinkedList<>(Arrays.asList(
-                76, 85, 18, 31, 19, 86, 42, 46, 72, 66,
-                64, 16, 68, 5, 73, 93, 84, 88, 92, 99, 3, 4, 5));
-
-        System.out.println(findMissingNumber(new int[] {0, 1, 3}));
-    }
 }

@@ -5,8 +5,33 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AlgorithmsTest {
+    public static <T extends Comparable<T>> void assertSorted(Queue<T> q) {
+        T prev = null;
+        for (T s : q) {
+            if (prev != null)
+                assertTrue(s.compareTo(prev) >= 0);
+            prev = s;
+        }
+    }
+
+    @Test()
+    public void testMain() {
+        Queue<String> queue = new LinkedList<>();
+        queue.addAll(Arrays.asList("a", "b", "a", "z", "c", "a", "b"));
+        Algorithms.sortQueue(queue);
+        assertSorted(queue);
+
+        Queue<Integer> q = new LinkedList<>(Arrays.asList(
+                76, 85, 18, 31, 19, 86, 42, 46, 72, 66,
+                64, 16, 68, 5, 73, 93, 84, 88, 92, 99, 3, 4, 5));
+        Algorithms.sortQueue(q);
+        assertSorted(q);
+
+        System.out.println(Algorithms.findMissingNumber(new int[] {0, 1, 3}));
+    }
 
     @Test(timeout=1000)
     public void testSortQueueExample1() {
@@ -51,6 +76,9 @@ public class AlgorithmsTest {
     public void testFindMissingNumberExample2() {
         int[] arr = {4, 1, -5};
         assertEquals(-2, Algorithms.findMissingNumber(arr));
+
+        int[] arr2 = {1, 2, 4, 5};
+        assertEquals(3, Algorithms.findMissingNumber(arr2));
     }
 
     @Test
