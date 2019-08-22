@@ -18,12 +18,10 @@ public class Algorithms {
         int size = queue.size();
         T a, b, prev;
         boolean repeat = true;
-        int iterations = 0;
         while (repeat) {
             iterations++;
             repeat = false;
             //System.out.println("\niterating");
-            System.out.println("" + iterations + ": " + queue);
 
             a = queue.remove();
             b = null;
@@ -54,14 +52,6 @@ public class Algorithms {
             // add back the last element.
             queue.add(a != null ? a : b);
         }
-        System.out.println(queue);
-        System.out.println("took " + iterations + " iterations, size " + size);
-        System.out.println();
-    }
-
-    /** Returns the absolute value of a. */
-    private static int abs(int a) {
-        return a < 0 ? -a : a;
     }
 
     /**
@@ -70,9 +60,11 @@ public class Algorithms {
      * @param numbers Arithmetic sequence with one missing term.
      * @param start Lowest bound of missing term's index.
      * @param end Upper bound of missing term's index.
+     * @param delta Expected step between adjacent values in the sequence.
      * @return Value of missing term.
      */
-    private static int findNumInRange(int[] numbers, int start, int end) {
+    private static int findNumInRange(int[] numbers, int start, int end,
+                                      int delta) {
         int len = end - start + 1; // length of subarray we are considering
         // System.out.println(Arrays.toString(numbers) + " " + start + " " +end);
         if (len == 2) { // base case.
@@ -80,25 +72,16 @@ public class Algorithms {
         }
 
         int middle = start + len/2; // index of middle split
-        // total differences between start and end of left/right halves.
-        int leftDiff = numbers[middle] - numbers[start];
-        int rightDiff = numbers[end] - numbers[middle];
+        int leftDifference = numbers[middle] - numbers[start];
 
-        // to compute the difference between adjacent elements, we test
-        //      | leftDiff / (middle-start) |  > | rightDiff / (len - middle) |
-        // which occurs if and only if
-        //      |leftDiff| * (len - middle) > |rightDiff| * (middle - start)
-        // to avoid floating-point rounding problems
-        int leftCompare = leftDiff * (end - middle);
-        int rightCompare = rightDiff * (middle - start);
-
-        // side with larger absolute delta has a missing number.
-        if (abs(leftCompare) > abs(rightCompare)) {
+        // if the left difference is exactly the number of steps on the left
+        // side + 1, then we know that the number is missing from the left.
+        if (leftDifference == delta * (middle - start+ 1)) {
             // missing number is in the left half.
-            return findNumInRange(numbers, start, middle);
+            return findNumInRange(numbers, start, middle, delta);
         } else {
             // missing number is in the right half.
-            return findNumInRange(numbers, middle, end);
+            return findNumInRange(numbers, middle, end, delta);
         }
     }
 
@@ -109,7 +92,12 @@ public class Algorithms {
      * @return the missing number in the sequence
      */
     public static int findMissingNumber(int[] numbers) {
-        return findNumInRange(numbers, 0, numbers.length-1);
+        int len = numbers.length-1;
+        // we expect len+1 'steps' in the sequence between the start and
+        // end numbers, because one item is missing.
+        int delta = (numbers[len] - numbers[0]) / (len + 1);
+
+        return findNumInRange(numbers, 0, len, delta);
     }
 
     public static void main(String[] args) {
