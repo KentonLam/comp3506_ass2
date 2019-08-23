@@ -19,9 +19,12 @@
 \section*{Question 2 -- {Analysis of {sortQueue}}}
 
 The algorithm implemented is a variant of bubble sort (the algorithm wont be
-explained, see code comments). The runtime of this algorithm depends on the number
-of elements out of order. Also, note that bubble sort moves elements at different speeds,
-depending if they need to move up or down. Suppose we have a queue of $n$ elements
+explained, see code comments). Because bubble sort moves elements at different speeds
+depending if they need to move up or down, 
+the runtime of this algorithm depends on the number
+of elements out of order. 
+
+Suppose we have a queue of $n$ elements
 \begin{align*}
     A &= \left[ a_1, a_2, \ldots, a_n \right].
 \end{align*}
@@ -74,8 +77,6 @@ static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
 
             // 3: .compareTo(), comparison, assignment
             T toPush = a.compareTo(b) < 0 ? a : b;
-            // 2: comparison, assignment
-            T other = toPush == a ? b : a;
             // 1: .add()
             queue.add(toPush);
 
@@ -84,16 +85,17 @@ static <T extends Comparable<T>> void sortQueue(Queue<T> queue) {
             } else {
                 b = null;      // 1: assignment
             }
+
             // on first run, prev = null so
             //   1: comparison
             // on subsequent runs, prev != null so
-            //   3: comparison, .comparTo(), comparison
+            //   3: comparison, .compareTo(), comparison
             if (prev != null && prev.compareTo(toPush) > 0) {
                 repeat = true; // 1: assignment
             }
             prev = toPush;     // 1: assignment
         }
-        // 3: .add(), comparison
+        // 2: .add(), comparison
         queue.add(a != null ? a : b);
     }
 }
@@ -106,16 +108,16 @@ otherwise $T(n, k) = 3$ trivially.
 \begin{itemize}
     \item Firstly, $T_I(n, k) = 5$ because there are a constant number of operations.
     \item Then, working inside-out, we consider the inner for loop. Because we are looking for
-    an upper bound, that the branch of the final if statement is taken every iteration.
-    Then, $T_F(n, k) = 16$.
-    \item The while loop contains $10$ primitive operations and $n-1$ iterations of the for loop, so 
-    $T_W(n, k) = 10 + (n-1)T_F(n, k)$.
+    an upper bound, suppose the branch of the final if statement is taken every iteration.
+    Then, $T_F(n, k) = 14$.
+    \item The while loop contains $9$ primitive operations and $n-1$ iterations of the for loop, so 
+    $T_W(n, k) = 9 + (n-1)T_F(n, k)$.
     \item Finally, the function contains $k$ iterations of the while loop, so 
     \begin{align*}
         T(n, k) &= T_I(n, k) + k T_W(n, k) \\ 
-        &= 5 + k(10 + (n-1)16) \\ 
-        &= 5 + 10k + k(n-1)16 \\ 
-        &= 5 - 6k + 16nk
+        &= 5 + k(9 + (n-1)14) \\ 
+        &= 5 + 9k + k(n-1)14 \\ 
+        &= 5 - 5k + 14nk
     \end{align*}
 \end{itemize}
 Because we are looking for the worst-case upper bound, we assume $k = n$. Then, we have 
@@ -127,23 +129,52 @@ Assume $n \ge 1$. Then,
 \begin{align*}
     T(n) = 5 - 6n + 16n^2 \le 5 + 16n^2 \le 5n^2 + 16n^2 = 21n^2.
 \end{align*}
-So $n_0 = 1$ and $c = 21$ fulfil this requirement and $T(n) \in O(n^2)$.
+So $n_0 = 1$ and $c = 21$ fulfil this requirement and worst-case 
+$T(n) \in O(n^2)$.
+Also, it can be seen that if $k \ll n$, this algorithm runs in approximately
+$O(n)$ time.
 
 
 \section*{Question 4 -- {Analysis of {findMissingNumber}}}
-It can be seen that the algorithm implemented performs a constant 
-number of operations, then a recursive call on $n/2$ of the input size.
-Then if $n$ is the input size, then the running time of findMissingNumber
+Suppose the input is an array of $n \ge 2$ numbers. 
+First, if $n = 2$, the algorithm finishes in a constant number of operations.
+Then, if $n > 2$, it can be seen that the algorithm performs a constant 
+number of operations then a recursive call on $n/2$ of the input size.
+
+Thus the recursive running time of findMissingNumber
 is
 \begin{align*}
-    T(n) &= T(n/2) + O(1).
+    T(n) &= \begin{cases}
+        O(1) & n = 2 \\ 
+        T(n/2) + O(1) & n > 2
+    \end{cases}
 \end{align*}
-Thus, the call tree looks like a sequence (a tree where nodes have at most one child)
-of length $\lceil \log_2 n\rceil$. Each function call takes $O(1)$ operations, so the total 
-worst case runtime is 
+We solve for an explicit expression for the runtime. Suppose $n > 2$.
 \begin{align*}
-    T(n) &= O(1)\lceil \log_2 n\rceil  \in O(\log_2 n).
+    T(n) &= T(n/2) + O(1) \\ 
+    &= T(n/4) + 2O(1) \\ 
+    &= T(n/8) + 3O(1) \\
+    &= T(n/2^k) + kO(1)
 \end{align*}
+Above, $k$ is the number of recursive calls needed. The base case is at $T(2)$, 
+so we can solve for $k$ like so,
+\begin{align*}
+    \frac{n}{2^k} = 2 \implies n &= 2^{k+1} \\ 
+    k &= \log_2 n - 1
+\end{align*}
+Substituting this into the above equation, we have 
+\begin{align*}
+    T(n) &= T(2) + (\log_2 n - 1)O(1) \\ 
+    &= O(1)+ (\log_2 n - 1)O(1) \\ 
+    &= \log_2 n O(1)
+\end{align*}
+$T(n)$ is some scalar multiple of $\log_2 n$, so we conclude this 
+findMissingNumber is $O(\log_2 n)$.
+
+In the recursive call tree, the depth is $\lceil \log_2 n \rceil$,
+each branch has exactly one child and each function call takes $O(1)$. This implies the runtime is $O(\log_2 n)$,
+confirming the result above.
+
 
 
 \end{document}
